@@ -32,8 +32,64 @@ jobs:
       - name: Build Project
         run: make
 
-      - name: Create Directory to Binary
-        run: mkdir -p release && mv bin/Program release/WebDomCompiler
+      - name: Create Directory for Distribuction
+        run: |
+          mkdir -p release
+          mv bin/Program release/WebDomCompiler
+
+      - name: Create Install Script
+        run: |
+          cat << 'EOF' << release/install.sh
+          #!/bin/bash
+          INSTALL_DIR="/usr/local/bin"
+          EXPORT_FILE="$HOME/.web_dom_compiler_env"
+
+          echo "🔧 Installing WebDomCompiler..."
+
+          sudo cp WebDomCompiler "$INSTALL_DIR/"
+          sudo chmod +x "$INSTALL_DIR/WebDomCompiler"
+
+          echo "export WEB_DOM_COMPILER_HOME=$INSTALL_DIR" > "$EXPORT_FILE"
+          echo "export PATH=\$PATH:$INSTALL_DIR" >> "$EXPORT_FILE"
+
+          cat <<EOL | sudo tee /usr/share/applications/WebDomCompiler.desktop
+          [Desktop Entry]
+          Name=WebDomCompiler
+          Exec=$INSTALL_DIR/WebDomCompiler
+          Icon=utilities-terminal
+          Type=Application
+          Categories=Development;
+          EOL
+
+          echo "✅ Installation Complete!"
+          EOF
+          chmod +x release/install.sh
+
+      - name: Create Uninstall Script
+        run: |
+          cat << 'EOF' > release/uninstall.sh
+          #!/bin/bash
+          INSTALL_DIR="/usr/local/bin"
+          EXPORT_FILE="$HOME/.web_dom_compiler_env"
+          SHELL_RC="$HOME/.bashrc"
+
+          if [ -f "$HOME/.zshrc" ]; then SHELL_RC="$HOME/.zshrc"; fi
+
+          echo "🔧 Removing WebDomCompiler..."
+
+          sudo rm -rf -f "$INSTALL_DIR/WebDomCompiler"
+
+          rm -f "$EXPORT_FILE"
+          sed -i '/source \$HOME\/.web_dom_compiler_env/d' "$SHELL_RC"
+
+          sudo rm -f /usr/share/applications/WebDomCompiler.desktop
+
+          echo "✅ Removed successfully!"
+          EOF
+          chmod +x release/uninstall.sh
+
+      - name: Create Tarball (.tar.gz)
+        run: tar -czvf release/WebDomCompiler-${{env.version}}.tar.gz -C release .
 
       - name: Upload binary as artifacts
         uses: actions/upload-artifact@v4

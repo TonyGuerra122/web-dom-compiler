@@ -89,7 +89,11 @@ jobs:
           chmod +x release/uninstall.sh
 
       - name: Create Tarball (.tar.gz)
-        run: tar -czvf release/WebDomCompiler-${{env.version}}.tar.gz -C release .
+        run: |
+          mkdir -p package_temp
+          cp -r release/* package_temp/
+          tar -czvf release/WebDomCompiler-${{ env.version }}.tar.gz -C package_temp .
+          rm -rf package_temp
 
       - name: Upload binary as artifacts
         uses: actions/upload-artifact@v4

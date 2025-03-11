@@ -8,27 +8,18 @@
 #include <filesystem>
 #include "utils.hpp"
 
-enum DOM_TYPE
-{
-    HTML,
-    CSS,
-    JAVASCRIPT
-};
+#define SO_NAME "libhtml.so"
 
 class Compiler
 {
 public:
-    Compiler(const char *, DOM_TYPE);
+    Compiler(const char *);
 
     void compile();
-    static DOM_TYPE charToDomType(const char *);
 
 private:
     const char *m_filePath;
-    DOM_TYPE m_domType;
 
     std::string toCppStringLiteral();
     std::string generateCppSource();
-
-    const char *getTypeName();
 };

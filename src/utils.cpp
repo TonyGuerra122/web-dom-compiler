@@ -8,7 +8,7 @@ std::string utils::readFile(const char *filePath)
 
     if (!file.is_open())
     {
-        std::cerr << "Erro ao ler o arquivo!" << std::endl;
+        std::cerr << "Error reading file!" << std::endl;
         return "";
     }
 
@@ -47,7 +47,7 @@ std::string utils::inlineAssets(const char *filePath)
         }
         else
         {
-            std::cerr << "Aviso: Arquivo CSS não encontrado: " << cssPath << std::endl;
+            std::cerr << "Warning: CSS file not found: " << cssPath << std::endl;
         }
     }
 
@@ -62,7 +62,7 @@ std::string utils::inlineAssets(const char *filePath)
         }
         else
         {
-            std::cerr << "Aviso: Arquivo JS não encontrado: " << jsPath << std::endl;
+            std::cerr << "Warning: JS file not found: " << jsPath << std::endl;
         }
     }
 

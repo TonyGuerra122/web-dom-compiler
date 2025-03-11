@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdlib>
 #include <filesystem>
+#include "utils.hpp"
 
 enum DOM_TYPE
 {
@@ -18,18 +19,16 @@ class Compiler
 {
 public:
     Compiler(const char *, DOM_TYPE);
-    ~Compiler();
 
     void compile();
     static DOM_TYPE charToDomType(const char *);
 
 private:
-    std::ifstream m_file;
+    const char *m_filePath;
     DOM_TYPE m_domType;
 
     std::string toCppStringLiteral();
     std::string generateCppSource();
-    std::string readFileToString(); // ❌ REMOVIDO static!
 
     const char *getTypeName();
 };

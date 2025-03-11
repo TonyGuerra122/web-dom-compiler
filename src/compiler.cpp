@@ -1,44 +1,17 @@
 #include "../includes/compiler.hpp"
 
-Compiler::Compiler(const char *filePath, DOM_TYPE domType) : m_file(filePath), m_domType(domType)
+Compiler::Compiler(const char *filePath, DOM_TYPE domType) : m_filePath(filePath), m_domType(domType)
 {
-    if (!m_file)
-    {
-        std::cerr << "Erro ao abrir o arquivo: " << filePath << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
-
-Compiler::~Compiler()
-{
-    if (m_file.is_open())
-    {
-        m_file.close();
-    }
-}
-
-std::string Compiler::readFileToString()
-{
-    if (!m_file.is_open())
-    {
-        std::cerr << "Erro ao ler o arquivo!" << std::endl;
-        return "";
-    }
-
-    m_file.clear();                 // Limpa flags de erro, se houver
-    m_file.seekg(0, std::ios::beg); // Retorna ao início do arquivo
-
-    std::ostringstream buffer;
-    buffer << m_file.rdbuf();
-    return buffer.str();
 }
 
 std::string Compiler::toCppStringLiteral()
 {
-    std::string content = readFileToString();
+    const std::string content = utils::readFile(m_filePath);
+
+    const std::string finalContent = utils::inlineAssets(m_filePath);
 
     std::ostringstream output;
-    output << "R\"(" << content << ")\"";
+    output << "R\"(" << finalContent << ")\"";
 
     return output.str();
 }
@@ -90,14 +63,12 @@ void Compiler::compile()
 
     std::string outputSoFile = "lib" + std::string(getTypeName()) + ".so"; // Corrigido nome do .so
 
-    // Remover o arquivo antigo antes de compilar
-    std::string removeCommand = "rm -f " + outputSoFile;
-    std::system(removeCommand.c_str());
+    std::filesystem::remove(outputSoFile);
 
     std::string compileCommand = "g++ -shared -fPIC " + outputCppFile + " -o " + outputSoFile;
     int result = std::system(compileCommand.c_str());
 
-    std::filesystem::remove(outputCppFile);
+    // std::filesystem::remove(outputCppFile);
 
     if (result == 0)
     {

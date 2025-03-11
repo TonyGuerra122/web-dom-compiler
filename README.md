@@ -44,15 +44,14 @@ make
 ## 📄 Usage
 To convert a file into a shared library, run:
 ```bash
-./bin/Program <file> <type>
+./bin/Program <file> 
 ```
 Where:
 -   `<file>` is the path to your HTML, CSS, or JavaScript file.
--   `<type>` is either html, css, or js.
 
 ### Example
 ```bash
-./bin/Program index.html html
+./bin/Program index.html
 ```
 This will generate a `libhtml.so` file.
 

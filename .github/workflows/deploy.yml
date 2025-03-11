@@ -10,6 +10,12 @@ on:
       - main
       - develop
 
+permissions:
+  contents: write
+
+env:
+  version: 1.0.0
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,3 +29,32 @@ jobs:
 
       - name: Build Project
         run: make
+
+      - name: Create Directory to Binary
+        run: mkdir -p release && mv bin/Program release/WebDomCompiler
+
+      - name: Upload binary as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebDomCompiler
+          path: release/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: WebDomCompiler
+          path: release/
+
+      - name: Create GitHub Release and Upload Binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -68,7 +68,7 @@ void Compiler::compile()
     std::string compileCommand = "g++ -shared -fPIC " + outputCppFile + " -o " + outputSoFile;
     int result = std::system(compileCommand.c_str());
 
-    // std::filesystem::remove(outputCppFile);
+    std::filesystem::remove(outputCppFile);
 
     if (result == 0)
     {

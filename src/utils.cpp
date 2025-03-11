@@ -38,7 +38,7 @@ std::string utils::inlineAssets(const char *filePath)
 
     while (std::regex_search(htmlContent, match, linkRegex))
     {
-        std::string cssPath = filePathFolder.append(match[1].str());
+        fs::path cssPath = filePathFolder / match[1].str();
         if (fs::exists(cssPath))
         {
             std::string cssContent = readFile(cssPath.c_str());

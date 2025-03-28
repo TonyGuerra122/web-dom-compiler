@@ -120,8 +120,6 @@ jobs:
       - name: Download artifacts from both OS
         uses: actions/download-artifact@v4
         with:
-          # Baixa os artefatos dos dois sistemas usando nomes fixos
-          name: WebDomCompiler-ubuntu-latest-${{ github.run_id }},WebDomCompiler-windows-latest-${{ github.run_id }}
           path: release/
 
       - name: Create GitHub Release and Upload Binary

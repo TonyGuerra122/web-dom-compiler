@@ -44,7 +44,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mkdir release
-          move bin\Program.exe release\WebDomCompiler.exe
+          move bin\Program.exe release/WebDomCompiler.exe
 
       - name: Create Install Script (Linux)
         if: runner.os == 'Linux'
@@ -117,15 +117,26 @@ jobs:
       contents: write
 
     steps:
-      - name: Download artifacts from both OS
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: release/
+          path: artifacts
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release_flat
+          # Para cada diretório dentro de 'artifacts', copia os arquivos para 'release_flat'
+          for d in artifacts/*; do
+            if [ -d "$d" ]; then
+              cp -r "$d"/* release_flat/
+            fi
+          done
+          ls -la release_flat
 
       - name: Create GitHub Release and Upload Binary
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          files: release/*
+          files: release_flat/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

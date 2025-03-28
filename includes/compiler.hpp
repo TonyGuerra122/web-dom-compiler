@@ -19,6 +19,7 @@ public:
 
 private:
     const char *m_filePath;
+    utils::OS_TYPE m_osType;
 
     std::string toCppStringLiteral();
     std::string generateCppSource();

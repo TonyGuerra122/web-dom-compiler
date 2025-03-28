@@ -2,6 +2,7 @@
 
 Compiler::Compiler(const char *filePath) : m_filePath(filePath)
 {
+    this->m_osType = utils::getOsType();
 }
 
 std::string Compiler::toCppStringLiteral()
@@ -44,9 +45,24 @@ void Compiler::compile()
     outfile << cppSource;
     outfile.close();
 
+    // Remove biblioteca compartilhada existente, se houver
     std::filesystem::remove(SO_NAME);
 
-    std::string compileCommand = "g++ -shared -fPIC " + outputCppFile + " -o " + SO_NAME;
+    std::string compileCommand;
+    if (m_osType == utils::OS_TYPE::LINUX)
+    {
+        compileCommand = "g++ -shared -fPIC " + outputCppFile + " -o " + SO_NAME;
+    }
+    else if (m_osType == utils::OS_TYPE::WINDOWS)
+    {
+        compileCommand = "g++ -shared " + outputCppFile + " -o " + SO_NAME;
+    }
+    else
+    {
+        std::cerr << "Unsupported OS." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     int result = std::system(compileCommand.c_str());
 
     std::filesystem::remove(outputCppFile);

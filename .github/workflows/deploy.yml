@@ -4,13 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
-    tags:
-      - "v*"
-  pull_request:
-    branches:
-      - main
-      - develop
 
 permissions:
   contents: write
@@ -20,47 +13,54 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Code Checkout
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential
+      - name: Install Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Install Dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: choco install make -y
 
       - name: Build Project
         run: make
 
-      - name: Create Directory for Distribution
+      - name: Create Directory for Distribution (Linux)
+        if: runner.os == 'Linux'
         run: |
           mkdir -p release
           mv bin/Program release/WebDomCompiler
 
-      - name: Create Install Script
+      - name: Create Directory for Distribution (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir release
+          move bin\Program.exe release\WebDomCompiler.exe
+
+      - name: Create Install Script (Linux)
+        if: runner.os == 'Linux'
         run: |
           cat << 'EOF' > release/install.sh
           #!/bin/bash
           INSTALL_DIR="/usr/local/bin"
           EXPORT_FILE="$HOME/.web_dom_compiler_env"
           SHELL_RC="$HOME/.bashrc"
-
           if [ -f "$HOME/.zshrc" ]; then SHELL_RC="$HOME/.zshrc"; fi
-
           echo "🔧 Installing WebDomCompiler..."
-
-          # Copy executable
           sudo cp WebDomCompiler "$INSTALL_DIR/"
           sudo chmod +x "$INSTALL_DIR/WebDomCompiler"
-
-          # Create environment variables
           echo "export WEB_DOM_COMPILER_HOME=$INSTALL_DIR" > "$EXPORT_FILE"
           echo "export PATH=\$PATH:$INSTALL_DIR" >> "$EXPORT_FILE"
-
-          # Add to .bashrc or .zshrc
           echo "source $EXPORT_FILE" >> "$SHELL_RC"
-
-          # Create Desktop Shortcut
           cat <<EOL | sudo tee /usr/share/applications/WebDomCompiler.desktop
           [Desktop Entry]
           Name=WebDomCompiler
@@ -69,40 +69,40 @@ jobs:
           Type=Application
           Categories=Development;
           EOL
-
           echo "✅ Installation Complete! Restart your terminal or run 'source $EXPORT_FILE' to apply environment variables."
           EOF
           chmod +x release/install.sh
 
-      - name: Create Uninstall Script
+      - name: Create Uninstall Script (Linux)
+        if: runner.os == 'Linux'
         run: |
           cat << 'EOF' > release/uninstall.sh
           #!/bin/bash
           INSTALL_DIR="/usr/local/bin"
           EXPORT_FILE="$HOME/.web_dom_compiler_env"
           SHELL_RC="$HOME/.bashrc"
-
           if [ -f "$HOME/.zshrc" ]; then SHELL_RC="$HOME/.zshrc"; fi
-
           echo "🔧 Removing WebDomCompiler..."
-
           sudo rm -f "$INSTALL_DIR/WebDomCompiler"
-
           rm -f "$EXPORT_FILE"
           sed -i '/source \$HOME\/.web_dom_compiler_env/d' "$SHELL_RC"
-
           sudo rm -f /usr/share/applications/WebDomCompiler.desktop
-
           echo "✅ Removed successfully! Restart your terminal for changes to take effect."
           EOF
           chmod +x release/uninstall.sh
 
-      - name: Create Tarball (.tar.gz)
+      - name: Create Package (Linux - tar.gz)
+        if: runner.os == 'Linux'
         run: |
           mkdir -p package_temp
           cp -r release/* package_temp/
           tar -czvf release/WebDomCompiler-${{ env.version }}.tar.gz -C package_temp .
           rm -rf package_temp
+
+      - name: Create Package (Windows - zip)
+        if: runner.os == 'Windows'
+        run: |
+          powershell -Command "Compress-Archive -Path release\* -DestinationPath release\WebDomCompiler-${{ env.version }}.zip"
 
       - name: Upload binary as artifacts
         uses: actions/upload-artifact@v4

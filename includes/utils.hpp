@@ -9,6 +9,12 @@
 
 namespace utils
 {
+    enum OS_TYPE {
+        WINDOWS,
+        LINUX
+    };
+
     std::string readFile(const char *);
     std::string inlineAssets(const char *);
+    OS_TYPE getOsType();
 }

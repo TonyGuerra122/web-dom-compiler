@@ -68,3 +68,12 @@ std::string utils::inlineAssets(const char *filePath)
 
     return htmlContent;
 }
+
+utils::OS_TYPE utils::getOsType()
+{
+    #if defined(_WIN32) || defined(_WIN64)
+        return OS_TYPE::WINDOWS;
+    #else
+        return OS_TYPE::LINUX;
+    #endif
+}

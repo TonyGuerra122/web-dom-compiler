@@ -45,9 +45,9 @@ void Compiler::compile()
     outfile << cppSource;
     outfile.close();
 
-    std::string soName = std::string(SO_NAME);
-
-    soName += std::string(m_osType.c_str());
+    std::string soName = utils::getOsType() == utils::OS_TYPE::WINDOWS 
+        ? std::string(SO_NAME) + ".dll"
+        : std::string(SO_NAME) + ".so";
 
     // Remove biblioteca compartilhada existente, se houver
     std::filesystem::remove(soName);

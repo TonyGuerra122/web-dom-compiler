@@ -1,7 +1,7 @@
 # Compilation variables
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17
-LDFLAGS = 
+CXXFLAGS = -Wall -Wextra -std=c++17 -g -fsanitize=address
+LDFLAGS = -fsanitize=address
 
 # List all .cpp files in the directory
 SOURCES = $(wildcard src/*.cpp)

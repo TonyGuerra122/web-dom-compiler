@@ -44,16 +44,16 @@ make
 ## 📄 Usage
 To convert a file into a shared library, run:
 ```bash
-./bin/Program <file> 
+./bin/Program <file> (optinal) <dist_folder>
 ```
 Where:
 -   `<file>` is the path to your HTML, CSS, or JavaScript file.
-
+-   `<dist_folder` is the out path of dir libs
 ### Example
 ```bash
 ./bin/Program index.html
 ```
-This will generate a `libhtml.so` file.
+This will generate a `libhtml_[filename].so` file.
 
 ---
 

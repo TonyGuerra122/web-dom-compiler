@@ -34,13 +34,13 @@ std::string utils::inlineAssets(const char *filePath)
 
     std::smatch match;
 
-    // Processa arquivos CSS
+    // Process CSS files
     while (std::regex_search(htmlContent, match, linkRegex))
     {
         fs::path cssPath = filePathFolder / match[1].str();
         if (fs::exists(cssPath))
         {
-            // Converte o caminho para std::string antes de chamar readFile
+            // Convert the CSS file path to a string
             std::string cssContent = readFile(cssPath.string().c_str());
             std::string styleTag = "<style>\n" + cssContent + "\n</style>";
             htmlContent.replace(match.position(0), match.length(0), styleTag);
@@ -51,10 +51,10 @@ std::string utils::inlineAssets(const char *filePath)
         }
     }
 
-    // Processa arquivos JavaScript
+    // Process JS files
     while (std::regex_search(htmlContent, match, scriptRegex))
     {
-        // Cria um novo objeto path para o arquivo JS, sem modificar filePathFolder
+        // Create the path to the JS file
         fs::path jsFilePath = filePathFolder / match[1].str();
         if (fs::exists(jsFilePath))
         {

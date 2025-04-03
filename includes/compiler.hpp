@@ -8,7 +8,7 @@
 #include <filesystem>
 #include "utils.hpp"
 
-#define SO_NAME "libhtml.so"
+#define SO_NAME "libhtml"
 
 class Compiler
 {

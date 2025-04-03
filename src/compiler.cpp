@@ -45,17 +45,21 @@ void Compiler::compile()
     outfile << cppSource;
     outfile.close();
 
+    std::string soName = std::string(SO_NAME);
+
+    soName += std::string(m_osType.c_str());
+
     // Remove biblioteca compartilhada existente, se houver
-    std::filesystem::remove(SO_NAME);
+    std::filesystem::remove(soName);
 
     std::string compileCommand;
     if (m_osType == utils::OS_TYPE::LINUX)
     {
-        compileCommand = "g++ -shared -fPIC " + outputCppFile + " -o " + SO_NAME;
+        compileCommand = "g++ -shared -fPIC " + outputCppFile + " -o " + soName;
     }
     else if (m_osType == utils::OS_TYPE::WINDOWS)
     {
-        compileCommand = "g++ -shared " + outputCppFile + " -o " + SO_NAME;
+        compileCommand = "g++ -shared " + outputCppFile + " -o " + soName;
     }
     else
     {
@@ -69,7 +73,7 @@ void Compiler::compile()
 
     if (result == 0)
     {
-        std::cout << "Shared library created successfully: " << SO_NAME << std::endl;
+        std::cout << "Shared library created successfully: " << soName << std::endl;
     }
     else
     {

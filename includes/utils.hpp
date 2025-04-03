@@ -10,8 +10,8 @@
 namespace utils
 {
     enum OS_TYPE {
-        WINDOWS,
-        LINUX
+        WINDOWS = ".dll",
+        LINUX = ".so"
     };
 
     std::string readFile(const char *);
